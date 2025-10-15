@@ -69,7 +69,7 @@ class Arm:
         self._send(f"M280 P{self.SERVO_INDEX} S{int(angle)}", True)
         self._send(f"G4 P{self.SERVO_DWELL_MS}", True)
 
-    # ===== ciclo de vida =====
+    # Abre y sincroniza el Marlin, aplica el un set up seguro y abre el hilo del worker
     def open(self):
         self.ser = serial.Serial(self.port, baudrate=self.baud, timeout=0.25, write_timeout=1)
         time.sleep(0.2)
@@ -77,7 +77,7 @@ class Arm:
         try:
             self.ser.setDTR(False); time.sleep(0.2); self.ser.setDTR(True)
         except Exception: pass
-        
+
         # Leer banner de arranque (si lo hay)
         t0 = time.time(); _ = b""
         while time.time() - t0 < 3.0:
@@ -106,7 +106,7 @@ class Arm:
         self._worker.start()
         print(f"[{self.name}] Serial listo en {self.port}@{self.baud}")
 
-    #Funcion
+    #Funcion para cerrar el brazo de forma ordenada y detiene el worker y cierra el puerto serie
     def close(self, reenable_endstops=True, keep_on=True):
         self._running.clear()
         if self._worker:
@@ -121,11 +121,12 @@ class Arm:
         if self.ser and self.ser.is_open: self.ser.close()
         print(f"[{self.name}] Cerrado.")
 
+    #Funcion que envia M410 sin esperar el "Ok", frena al instante manteniendo el torque e ignora errores
     def quickstop(self):
         try: self._send("M410", ensure_ok=False)
         except Exception: pass
 
-    # ===== worker =====
+    # Funcion que lee la cola de comandos y los despacha secuencialmente enviandolos al Marlin
     def _loop(self):
         while self._running.is_set():
             try:
@@ -139,13 +140,18 @@ class Arm:
             if cmd == "MACRO":          self._do_macro(kwargs.get("name","")); continue
             self._send(str(cmd), True)
 
-    # ===== API pública =====
+    # API pública 
+    #Envia G-Code tal cual
     def enqueue_raw(self, line: str, ensure_ok=True): self.q.put(("__RAW__", {"line": line, "ok": ensure_ok}))
-    def estop_soft(self):                                self.q.put(("__ESTOP_SOFT__", {}))
+    #Freno rapido M410
+    def estop_soft(self):self.q.put(("__ESTOP_SOFT__", {}))
+    #Mueve en relativo G1
     def move_delta(self, axes: dict, feed: int = 1200):  self.q.put(("MOVE_DELTA", {"axes": dict(axes or {}), "feed": int(feed)}))
-    def run_macro(self, name: str):                      self.q.put(("MACRO", {"name": name}))
+    #Ejecuta la secuencia por nombre enviado del MQTT
+    def run_macro(self, name: str):self.q.put(("MACRO", {"name": name}))
 
-    # ===== implementación =====
+    # Implementacion
+    #Funcion que limita cada eje a valores seguros, arma un G1 relativo con esos deltas, selecciona T0 si usas E, lo envia y espera a que termine (M400) 
     def _do_move_delta(self, axes: dict, feed: int):
         MAX = {"Y": 90, "Z": 60, "X": 30, "E": 45}
         def clamp(v, lo, hi): return max(lo, min(hi, v))
@@ -156,12 +162,14 @@ class Arm:
         line = "G1" + "".join(f" {k}{safe[k]}" for k in safe) + f" F{int(feed)}"
         self._send(line, True); self._send("M400", True)
 
+    #Orienta la pinza vertical usando la muñeca 1: selecciona T1 y mueve E una cantidad fija 
     def _wrist_roll_to_vertical(self):
         """Muñeca1 (roll) con T1+E para dejar pinza vertical."""
         self._send("T1", True)
         self._send(f"G1 E{self.WRIST_ROLL_TO_VERTICAL} F{self.FEED_WRIST}", True)
         self._send("M400", True)
 
+    #Mueve la muñeca 2(X) en muchos pasos para que vaya mas suave( se puede modificar )
     def _wrist_pitch_smooth(self, amp: float, steps: int = None):
         """Muñeca2 (pitch, X) en pasos pequeños (suave)."""
         if steps is None: steps = self.WRIST_STEPS
@@ -173,6 +181,7 @@ class Arm:
         for _ in range(steps):   self._send(f"G1 X{ step:.3f} F{self.FEED_WRIST}", True)
         self._send("M400", True)
 
+    #Ejecuta la secuencia dependiendo el comando enviado por MQTT
     def _do_macro(self, name: str):
         """
         L1/L2: base (barrido ±A) -> bajar -> roll a vertical -> abrir/cerrar -> subir -> muñeca suave.
@@ -182,7 +191,7 @@ class Arm:
           - 'roll_test_neg'  : T1 E -10
         """
         name = (name or "").strip().lower()
-
+        #Distintos casos dependiendo el mensaje que enviemos del MQTT
         def g(axis, dist, feed):
             self._send(f"G1 {axis}{dist} F{feed}", True); self._send("M400", True)
 
