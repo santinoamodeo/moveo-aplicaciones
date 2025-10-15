@@ -1,1 +1,1 @@
-# moveo-integracion-mediapipe
+# moveo-aplicaciones
