@@ -17,7 +17,7 @@ BROKER_PORT = 1883            # 1883 sin TLS (8883 con TLS)
 
 # Prefijo único para no chocar en broker público
 TOPIC_BASE  = "BrazoOctavio"  
-TOPIC_CMD   = f"{TOPIC_BASE}/cmd"     # recibe "L1" / "L2" o JSON
+TOPIC_CMD   = f"{TOPIC_BASE}/cmd"     # recibe casos de comando o JSON
 TOPIC_ESTOP = f"{TOPIC_BASE}/estop"   # {"soft":true} -> M410
 TOPIC_STAT  = f"{TOPIC_BASE}/status"  # publica estado
 
