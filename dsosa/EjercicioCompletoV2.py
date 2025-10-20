@@ -67,7 +67,7 @@ def send_gcode():
                             break
                 # Evita bloqueo eterno
                 if time.time() - start > 5:
-                    print("⚠️ Timeout esperando 'ok' de Marlin")
+                    print("//// Timeout esperando 'ok' de Marlin")
                     break
 
         # Esperar a que se vacíe el buffer y que termine el último movimiento
@@ -79,7 +79,7 @@ def send_gcode():
         ser.close()
 
     except Exception as e:
-        print("❌ Error:", e)
+        print("XXX Error:", e)
 
 if __name__ == "__main__":
     send_gcode()
