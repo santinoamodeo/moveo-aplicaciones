@@ -21,28 +21,28 @@ gcode_commands = [
     "T0",      
     "G1 E-45 F500",
     "G1 Z-15 F500",
-    
     #DEBE DE RETRAERSE 
     "T0",
-    "G1 Z-40 F500 E40 F500",
+    "G1 Z-40 F500 E40",
     "M400", #HACE QUE LOS MOVIMIENTOS SEAN SINCRONIZADOS, LOS PONE EN LA COLA A TODOS
-    "M280 P2 S160",#OBJETO AGARRAD0
-
+    "M280 P2 S170",#OBJETO AGARRAD0
+    "M400",
     "T0",
     #SE VUELVE
-    "G1 Z-24 F500 E-27 F500",  
-   
+    "G1 Z-24 F500 E-27",  
+    "G1 Z-21 F500",
     "G1 Y-85 F800",
-    
     "M400",
     "M280 P2 S90",
     #SE RETRAE YA SOLTADO
+    "G1 Z-24 F500",
     "T0",
-    "G1 Z-15 F500 E-10 F500",
+    "G1 Z-15 F500 E-10",
     "G1 Z0 F500",
     "G1 Y0 F800 E40",
-    "M84"
-    
+    "T1",
+    "G1 E-1 F100",
+    "M84"  
 
      
       # Base +30 grados
@@ -61,7 +61,13 @@ def send_gcode():
             ser.write((cmd + "\n").encode())  # Mandar comando
             print(">>", cmd)
             time.sleep(0.5)  # Pausa entre comandos (ajustable)
-
+ # ---------------------
+        # ESPERA FINAL PARA QUE SE EJECUTEN LOS ÚLTIMOS COMANDOS
+        time.sleep(2)         # Espera extra 2 segundos
+        ser.write(b"\n\n")    # Envía un par de saltos de línea extra
+        ser.flush()           # Asegura que se envíe todo lo que queda en el buffer
+        time.sleep(2)         # Otra espera por seguridad
+        # ---------------------
         print("Programa terminado. Motores siguen energizados.")
         ser.close()
 
