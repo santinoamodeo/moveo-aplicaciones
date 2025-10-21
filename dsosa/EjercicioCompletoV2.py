@@ -14,7 +14,7 @@ gcode_commands = [
     "M280 P2 S90",
     "T1",
     "G1 E1 F100",
-    "G1 Y127 F1200", #no tocar
+    "G1 Y127 F1300", #no tocar
     "T0",      
     "G1 E-45 F500",
     "G1 Z-15 F500",
@@ -28,7 +28,7 @@ gcode_commands = [
     #SE VUELVE
     "G1 Z-24 F500 E-27",  
     "G1 Z-21 F500",
-    "G1 Y-85 F800",
+    "G1 Y-85 F1300",
     "M400",
     "M280 P2 S90",
     #SE RETRAE YA SOLTADO
@@ -75,7 +75,7 @@ def send_gcode():
         ser.flush()
         time.sleep(3)
 
-        print("✅ Programa terminado correctamente.")
+        print("vvvv Programa terminado correctamente.")
         ser.close()
 
     except Exception as e:
