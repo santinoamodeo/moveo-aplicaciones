@@ -1,6 +1,8 @@
 import serial
 import time
 
+###  secuencia que agarra el vaso
+
 # Configura el puerto serie donde está conectado tu Arduino
 # En Windows suele ser COM3, COM4, etc. En Linux: /dev/ttyUSB0
 PORT = "COM4"    
@@ -14,28 +16,27 @@ gcode_commands = [
     "G90",          # Coordenadas ABSOLUTOS
     "M302 S",       # activa extrusores en frio
     "M400", #HACE QUE LOS MOVIMIENTOS SEAN SINCRONIZADOS, LOS PONE EN LA COLA A TODOS
-    "M280 P2 S90",
+    "M280 P0 S90",
     "T1",
-    "G1 E3 F100",
-    "G1 Y-180 F1300", #no tocar
+    "G1 E4 F100",
+    "G1 Y-170 F1300", #no tocar
     "T0",      
-    "G1 E30 Z23 F500",
+    "G1 E-30 F500",
+    "G1 E-10 Z38 F500",
     "M400",
-    "M280 P2 S180",
-    "G1 E-30 Z0 F500",#YA ESTA EN SU POSICION 0
-    "T1",
-    "G1 E-6 F100",
-    "T0",
-    "G1 E-30 Z-23 F500",
+    "M280 P0 S150",
+    "G1 Z30 F500",
+    "G1 Y170 F1300",
+    "G1 Z38 F500",
     "M400",
-    "M280 P2 S90", ##SUELTA, DEBE VOLVER A REPOSO
-    "G1 Z0 E30 F500",
+    "M280 P0 S90",##DEJA EL VASO
+    "G1 E-2 Z30 F500",
+    "G1 Z28 F600",
+    "G1 E43 Z0 F500",
+    "G1 Y0 F1300",
     "T1",
-    "G1 E3 F100",
-    "G1 Y0 F1300"
+    "G1 E-4 F100"
 
-    
-    
 ]
 
 def send_gcode():

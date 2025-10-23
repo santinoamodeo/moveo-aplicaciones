@@ -3,4 +3,4 @@ para simular movimientos de un brazo robotico industrial real. Este código hace
 un extremo de la emsa, agarrarlo y dejarlo en el otro extremo, y volver a su posición de reposo, desactivando los motores evitando
 que estos se calienten al estar siempre energizados
 Posición de reposo: El brazo debe de estar completamente recto, con todas las marcas de los ejes alineadas, y es desde esta posición
-de donde esta escrito el código g para que se mueva hacia un lado o hacia al otro. 
+de donde esta escrito el código g para que se mueva hacia un lado o hacia al otro.

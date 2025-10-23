@@ -2,7 +2,7 @@ import serial
 import time
 
 PORT = "COM4"
-BAUDRATE = 115200
+BAUD = 115200
 
 gcode_commands = [
     "M17",          # Encender motores
@@ -44,7 +44,7 @@ gcode_commands = [
 
 def send_gcode():
     try:
-        ser = serial.Serial(PORT, BAUDRATE, timeout=2)
+        ser = serial.Serial(PORT, BAUD, timeout=2)
         time.sleep(2)  # Esperar a que Marlin inicie
         print("Conectado a", PORT)
 

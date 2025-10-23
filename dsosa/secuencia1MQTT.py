@@ -1,6 +1,8 @@
 import serial
 import time
 
+##ESTA SECUENCIA MUEVE DE UN EXTREMO DE LA MESA HACIA OTRO.
+
 # Configura el puerto serie donde está conectado tu Arduino
 # En Windows suele ser COM3, COM4, etc. En Linux: /dev/ttyUSB0
 PORT = "COM4"    
