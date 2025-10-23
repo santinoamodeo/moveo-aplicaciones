@@ -180,11 +180,47 @@ class Arm:
             self._g1_rel({'Z': +15}, 500, pausa=0.0)
             self.servo_close_open_close()
             self.vertical()
-
+        
+        elif name == "topa":
+            self._g1_rel({'Z': -15}, 500, pausa=0.0)
+            self.servo_close_open_close()
+            self._send("M83")
+            self._send("T1")
+            self._send("G1 E1 F100")
+        
+        elif name == "apu":
+            self._send("M17")
+            self._send("M83")
+            self._send("M84 S0")
+            self._send("G90")
+            self._send("M302 S")
+            self._send("M400")
+            self._send("M280 PO S90")
+            self._send("T1")
+            self._send("G1 E4 F100")
+            self._send("G1 Y-170 F1300")
+            self._send("T0")
+            self._send("G1 E-30 F500")
+            self._send("G1 E-10 Z35 F500")
+            self._send("M400")
+            self._send("M280 P0 S150")
+            self._send("G1 Z30 F500")
+            self._send("G1 Y170 F1300")
+            self._send("G1 Z38 F500")
+            self._send("M400")
+            self._send("M280 P0 S90")
+            self._send("G1 E-3 Z30 F500")
+            self._send("G1 Z28 F600")
+            self._send("G1 E43 Z0 F500")
+            self._send("G1 Y0 F1300")
+            self._send("T1")
+            self._send("G1 E-4 F100")
+            
         #Secuencia "parking"
         elif name == "parking":
             self._g1_rel({'Z': -15}, 500, pausa=0.0)
             self.vertical()
+            
         else:
             print((f"[ERROR] Macro desconocida: {name}"))
 
