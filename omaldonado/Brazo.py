@@ -201,7 +201,7 @@ class Arm:
             self._send("G1 Y-170 F1300")
             self._send("T0")
             self._send("G1 E-30 F500")
-            self._send("G1 E-10 Z35 F500")
+            self._send("G1 E-10 Z38 F500")
             self._send("M400")
             self._send("M280 P0 S150")
             self._send("G1 Z30 F500")
@@ -209,17 +209,34 @@ class Arm:
             self._send("G1 Z38 F500")
             self._send("M400")
             self._send("M280 P0 S90")
-            self._send("G1 E-3 Z30 F500")
+            self._send("G1 E-2 Z30 F500")
             self._send("G1 Z28 F600")
             self._send("G1 E43 Z0 F500")
             self._send("G1 Y0 F1300")
             self._send("T1")
             self._send("G1 E-4 F100")
+ 
             
         #Secuencia "parking"
         elif name == "parking":
+            A = self.AMP_BASE_L2
+            self._g1_rel({'Y': -A},   self.FEED_NORM, pausa=0.0)
+            self._g1_rel({'Y': +2*A}, self.FEED_NORM, pausa=0.0)
+            self._g1_rel({'Y': -A},   self.FEED_NORM, pausa=0.0)
+        
             self._g1_rel({'Z': -15}, 500, pausa=0.0)
             self.vertical()
+
+            self._g1_rel({"Z": +15}, 500, pausa=0.0 )
+            self.vertical()
+            self.servo_close_open_close()
+
+            self._g1_rel({'Y': -A},   self.FEED_NORM, pausa=0.0)
+            self._g1_rel({'Y': +2*A}, self.FEED_NORM, pausa=0.0)
+            self._g1_rel({'Y': -A},   self.FEED_NORM, pausa=0.0)
+
+            self.servo_close_open_close()
+
             
         else:
             print((f"[ERROR] Macro desconocida: {name}"))
