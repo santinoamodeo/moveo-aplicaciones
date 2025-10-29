@@ -68,7 +68,7 @@ class Arm:
         self.servo(self.SERVO_CLOSE)
         self.servo(self.SERVO_OPEN)
         self.servo(self.SERVO_CLOSE)
-
+  
     #Funcion que activa y prepara el brazo para operar
     def open(self):
         self.ser = serial.Serial(self.port, baudrate=self.baud, timeout=1, write_timeout=1)
@@ -146,7 +146,7 @@ class Arm:
         if name == "servo_test":
             self.servo_close_open_close()
             self.vertical()
-
+   
         #Secuencia "L2"
         elif name == "l2":
             # 1) BASE: barrido RELATIVO rápido y simétrico (sin pausas intermedias)
@@ -174,12 +174,18 @@ class Arm:
 
         #Secuencia "invert"
         elif name == "invert":
-            self._g1_rel({'Z': -15}, 500, pausa=0.0)
-            self.servo_close_open_close()
-            self.vertical()
-            self._g1_rel({'Z': +15}, 500, pausa=0.0)
-            self.servo_close_open_close()
-            self.vertical()
+           A = self.AMP_BASE_L2
+           self._g1_rel({'Y': -A},   self.FEED_NORM, pausa=0.0)
+           self._g1_rel({'Y': +2*A}, self.FEED_NORM, pausa=0.0)
+           self._g1_rel({'Y': -A},   self.FEED_NORM, pausa=0.0)
+           
+           self.servo_close_open_close()
+           self._send("G1 E-30 F500")
+           self.servo_close_open_close()
+           self._send("G1 E 30 F500")
+           self.vertical()
+           
+
         
         elif name == "topa":
             self._g1_rel({'Z': -15}, 500, pausa=0.0)
@@ -195,7 +201,7 @@ class Arm:
             self._send("G90")
             self._send("M302 S")
             self._send("M400")
-            self._send("M280 PO S90")
+            self._send("M280 P0 S90")
             self._send("T1")
             self._send("G1 E4 F100")
             self._send("G1 Y-170 F1300")
